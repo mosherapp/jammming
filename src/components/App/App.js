@@ -8,28 +8,26 @@ import Playlist from '../Playlist/Playlist';
 
 import Spotify from '../../util/Spotify';
 
-const tracksTemp = [
-  {id: 1, name: 'Name1', artist: 'artist', album: 'album'},
-  {id: 2, name: 'Name2', artist: 'artist', album: 'album'},
-  {id: 3, name: 'Name3', artist: 'artist', album: 'album'},
-  {id: 4, name: 'Name4', artist: 'artist', album: 'album'},
-  {id: 5, name: 'Name5', artist: 'artist', album: 'album'},
-  {id: 6, name: 'Name6', artist: 'artist', album: 'album'}
-];
-
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      Spotify: Spotify,
       SearchBarValue: '',
-      SearchResults: tracksTemp,
+      SearchResults: [],
       Playlist: [],
       PlaylistName: 'New Playlist',
     };
   }
-  handleSearch(e) {
-    Spotify.getAccessToken();
+  handleSearch() {
+    this.state.Spotify.getAccessToken();
+    if(this.state.Spotify.accessToken === '') {
+      return;
+    }
+    this.state.Spotify.search(this.state.SearchBarValue).then((data) => {
+      this.setState( {SearchResults: data} );
+    });
   }
   handlePlaylistNameChange(name) {
     this.setState({PlaylistName: name});
@@ -51,7 +49,10 @@ class App extends Component {
     }
   }
   handlePlaylistSave() {
-
+    this.state.Spotify.savePlaylist(this.state.PlaylistName, this.state.Playlist)
+    .then(() => {
+      this.setState({Playlist: [], PlaylistName: 'New Playlist'});
+    });
   }
   render() {
     return (
@@ -73,7 +74,7 @@ class App extends Component {
               name={this.state.PlaylistName}
               onNameChange={this.handlePlaylistNameChange.bind(this)}
               onTrackRemove={this.handlePlaylistUpdate.bind(this, 'remove')}
-              onSave={this.handlePlaylistSave}
+              onSave={this.handlePlaylistSave.bind(this)}
             />
           </div>
         </div>
