@@ -2,10 +2,8 @@ import React, { Component } from 'react';
 import './App.css';
 
 import SearchBar from '../SearchBar/SearchBar';
-
 import SearchResults from '../SearchResults/SearchResults';
 import Playlist from '../Playlist/Playlist';
-
 import Spotify from '../../util/Spotify';
 
 
@@ -13,7 +11,6 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      Spotify: Spotify,
       SearchBarValue: '',
       SearchResults: [],
       Playlist: [],
@@ -21,11 +18,11 @@ class App extends Component {
     };
   }
   handleSearch() {
-    this.state.Spotify.getAccessToken();
-    if(this.state.Spotify.accessToken === '') {
+    Spotify.getAccessToken();
+    if(Spotify.accessToken === '') {
       return;
     }
-    this.state.Spotify.search(this.state.SearchBarValue).then((data) => {
+    Spotify.search(this.state.SearchBarValue).then((data) => {
       this.setState( {SearchResults: data} );
     });
   }
@@ -49,7 +46,7 @@ class App extends Component {
     }
   }
   handlePlaylistSave() {
-    this.state.Spotify.savePlaylist(this.state.PlaylistName, this.state.Playlist)
+    Spotify.savePlaylist(this.state.PlaylistName, this.state.Playlist)
     .then(() => {
       this.setState({Playlist: [], PlaylistName: 'New Playlist'});
     });
